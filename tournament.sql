@@ -5,24 +5,31 @@
 --
 -- You can write comments in this file by starting them with two dashes, like
 -- these lines here.
+ -- delete view 'playersRanking' if exists
 
 DROP VIEW IF EXISTS playersRanking;
 
+ -- delete view 'playerStandings' if exists
 
 DROP VIEW IF EXISTS playerStandings;
 
+ -- delete talbe 'players' if exists
 
 DROP TABLE IF EXISTS players;
 
+ -- create talbe 'players'
 
 CREATE TABLE players(id serial, name varchar(50));
 
+ -- delete talbe 'matches' if exists
 
 DROP TABLE IF EXISTS matches;
 
+ -- create talbe 'matches'
 
 CREATE TABLE matches(id serial, round integer, player_id integer, opponent_id integer, is_win integer DEFAULT 0, is_lose integer DEFAULT 0, is_draw integer DEFAULT 0, is_bye integer DEFAULT 0, score integer DEFAULT 0);
 
+ -- create view 'playerStandings' to summerize player standings
 
 CREATE VIEW playerStandings AS
   (SELECT a.id,
@@ -52,17 +59,17 @@ CREATE VIEW playerStandings AS
       LEFT JOIN matches e ON d.opponent_id=e.player_id
       GROUP BY d.player_id) AS f ON a.id=f.player_id);
 
+ -- create view 'playerStandings' to add extra information in view 'playerStandings' for sorting
 
 CREATE VIEW playersRanking AS
   (SELECT row_number() over(
                             ORDER BY scores DESC ,opponent_scores DESC) AS rid,
-	           rank() over(
-	                       ORDER BY scores DESC ,opponent_scores DESC) AS rank,
-	                  *
+                       rank() over(
+                                   ORDER BY scores DESC ,opponent_scores DESC) AS rank,
+                              *
    FROM playerStandings);
 
-
--- SELECT a.id AS player1,
+ -- SELECT a.id AS player1,
 -- 	   a.name as name1,
 --        a.rank AS rank1,
 --        b.id AS player2,
@@ -78,5 +85,3 @@ CREATE VIEW playersRanking AS
 --   AND a.id<b.id
 --   and a.rid<b.rid
 --   and a.rank>=b.rank;
-
-
